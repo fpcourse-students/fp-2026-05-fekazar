@@ -16,10 +16,14 @@ data Nat = Zero | Suc Nat
   deriving (Eq, Show)
 
 makeNat :: Int -> Nat
-makeNat = todo "2.1 make"
+makeNat 0 = Zero
+makeNat x
+  | x < 0 = undefined
+  | otherwise = Suc (makeNat (x - 1))
 
 foldNat :: (a -> a) -> a -> Nat -> a
-foldNat = todo "2.1 fold"
+foldNat _ z Zero = z
+foldNat s z (Suc x) = foldNat s (s z) x
 
 
 -- 2.2. Другое бинарное дерево.
