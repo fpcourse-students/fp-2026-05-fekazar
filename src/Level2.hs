@@ -37,10 +37,14 @@ data BinTree a = Empty | BinNode (BinTree a) a (BinTree a)
   deriving (Eq, Show)
 
 mapBinTree :: (a -> b) -> BinTree a -> BinTree b
-mapBinTree = todo "2.2 map"
+mapBinTree _ Empty = Empty
+mapBinTree f (BinNode l x r) = BinNode (mapBinTree f l) (f x) (mapBinTree f r)
 
-bangAll t = todo "2.2 bang"
+mapToString :: (BinTree Int) -> (BinTree String)
+mapToString (BinNode l x r) = BinNode (mapToString l) ((show x) ++ "!") (mapToString r)
+mapToString Empty = Empty
 
+bangAll t = mapBinTree mapToString t
 
 -- 2.3. Лексикографическое сравнение.
 --
@@ -51,7 +55,13 @@ bangAll t = todo "2.2 bang"
 -- не передавайте целые списки стандартному (<) или compare.
 
 lexLess :: Ord a => [a] -> [a] -> Bool
-lexLess = todo "2.3"
+lexLess [] [] = False
+lexLess [] _ = True
+lexLess _ [] = False
+lexLess (lh:lt) (rh:rt)
+  | lh < rh = True
+  | lh > rh = False
+  | otherwise = lexLess lt rt
 
 
 -- 2.4. Цифры.
@@ -61,8 +71,15 @@ lexLess = todo "2.3"
 -- Отрицательный аргумент — error. Используйте div/mod или quotRem,
 -- без перевода числа в строку.
 
+digits' :: Int -> [Int]
+digits' x
+  | x < 0 = error "neg arg not allowed"
+  | x == 0 = [0]
+  | x < 10 = [x]
+  | otherwise = (x `mod` 10) : digits' (x `div` 10)
+
 digits :: Int -> [Int]
-digits = todo "2.4"
+digits = reverse . digits'
 
 
 -- 2.5. Числа Фибоначчи и списки.
@@ -79,10 +96,10 @@ fibs :: [Integer]
 fibs = 0 : 1 : zipWith (+) fibs (drop 1 fibs)
 
 isFib :: Integer -> Bool
-isFib = todo "2.5 is"
+isFib x = head (dropWhile (x>) fibs) == x
 
 countFibs :: [Integer] -> Int
-countFibs = todo "2.5 count"
+countFibs x = foldl (\acc x -> acc + if (isFib x) then 1 else 0) 0 x
 
 
 -- 2.6. Скользящее окно.
@@ -94,7 +111,12 @@ countFibs = todo "2.5 count"
 -- Сигнатуру не меняйте.
 
 withWindow :: [a] -> Int -> [[a]]
-withWindow = todo "2.6"
+withWindow _ n | n <= 0 = error "niggative n"
+withWindow [] _ = []
+withWindow a@(h:t) n
+  | length prefix < n = []
+  | otherwise = prefix:(t `withWindow` n)
+  where prefix = take n a
 
 
 -- 2.7. Сохраните проверенные опции в типе.
